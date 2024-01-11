@@ -9,19 +9,20 @@ const Game = ({ onLevelChange }) => {
     const [shapeStyles, setShapeStyles] = useState({
         left: '40%',
         top: '40%',
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        zIndex: 1, // Ensure the shape is rendered above other elements
     });
     const [holeStyles, setHoleStyles] = useState({
         left: '40%',
         top: '40%',
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
     });
     const [level, setLevel] = useState(1);
 
     useEffect(() => {
         // Constants for sensitivity and cooldown
         const sensitivity = 10; // Adjust as needed
-        const cooldownDuration = 1000; // 1 second cooldown, adjust as needed
+        const cooldownDuration = 100; // 1 second cooldown, adjust as needed
 
         let lastAlignmentTime = 0;
 
@@ -40,23 +41,22 @@ const Game = ({ onLevelChange }) => {
                 const boundedTop = Math.max(0, Math.min(100, newTop));
 
                 return {
+                    ...prevStyles,
                     left: `${boundedLeft}%`,
                     top: `${boundedTop}%`,
-                    backgroundColor: '#fff'
                 };
             });
 
             // Check if the shape is inside the hole with a cooldown
             const currentTime = Date.now();
             if (currentTime - lastAlignmentTime > cooldownDuration && isInsideHole()) {
+                // Increase the level and notify parent component about level change
+                const newLevel = level + 1;
+                setLevel(newLevel);
+                onLevelChange(newLevel);
+
                 // Handle successful placement (show response when the shape is hidden inside the hole)
-                alert(`Level ${level} completed!`);
-
-                // Increase the level
-                setLevel(level + 1);
-
-                // Notify parent component about level change
-                onLevelChange(level + 1);
+                alert(`Level ${newLevel} completed!`);
 
                 // Reset the game
                 resetGame();
@@ -91,7 +91,12 @@ const Game = ({ onLevelChange }) => {
     };
 
     const resetGame = () => {
-        setShapeStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
+        setShapeStyles({
+            left: '40%',
+            top: '40%',
+            backgroundColor: '#fff',
+            zIndex: 1, // Ensure the shape is rendered above other elements
+        });
         setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
 
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
