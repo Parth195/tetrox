@@ -22,7 +22,7 @@ const Game = ({ onLevelChange }) => {
     useEffect(() => {
         // Constants for sensitivity and cooldown
         const sensitivity = 10; // Adjust as needed
-        const cooldownDuration = 100; // 1 second cooldown, adjust as needed
+        const cooldownDuration = 1000; // 1 second cooldown, adjust as needed
 
         let lastAlignmentTime = 0;
 
@@ -56,7 +56,7 @@ const Game = ({ onLevelChange }) => {
                 onLevelChange(newLevel);
 
                 // Handle successful placement (show response when the shape is hidden inside the hole)
-                alert(`Level ${newLevel} completed!`);
+                alert(`Shape fitted! Level ${newLevel} completed!`);
 
                 // Reset the game
                 resetGame();
@@ -99,17 +99,17 @@ const Game = ({ onLevelChange }) => {
         });
         setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
 
+        // Remove all additional shapes
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
         additionalShapes.forEach((shape) => shape.remove());
+
+        // Create a new shape
+        createNewShape();
     };
 
     const increaseDifficulty = () => {
-        let fitCount = document.querySelectorAll(`.${styles.additionalShape}`).length;
-        let numberOfShapes = fitCount % 10 === 0 ? 2 : 1;
-
-        for (let i = 0; i < numberOfShapes; i++) {
-            createNewShape();
-        }
+        // Create a new shape for each level increase
+        createNewShape();
     };
 
     const createNewShape = () => {
@@ -124,21 +124,20 @@ const Game = ({ onLevelChange }) => {
 
         if (holeElement) {
             let hole = holeElement.getBoundingClientRect();
-            let shape = document.querySelector(`.${styles.additionalShape}`);
+            let shapes = document.querySelectorAll(`.${styles.additionalShape}`);
 
-            if (shape) {
+            for (let shape of shapes) {
                 let shapeRect = shape.getBoundingClientRect();
 
-                // Check if the center of the shape is inside the hole
-                let shapeCenterX = shapeRect.left + shapeRect.width / 2;
-                let shapeCenterY = shapeRect.top + shapeRect.height / 2;
-
-                return (
-                    shapeCenterX >= hole.left &&
-                    shapeCenterX <= hole.right &&
-                    shapeCenterY >= hole.top &&
-                    shapeCenterY <= hole.bottom
-                );
+                // Check if the entire shape is inside the hole
+                if (
+                    shapeRect.left >= hole.left &&
+                    shapeRect.right <= hole.right &&
+                    shapeRect.top >= hole.top &&
+                    shapeRect.bottom <= hole.bottom
+                ) {
+                    return true;
+                }
             }
         }
 
