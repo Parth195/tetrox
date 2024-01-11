@@ -126,6 +126,12 @@ const Game = () => {
                     shapeRect.top >= hole.top &&
                     shapeRect.bottom <= hole.bottom
                 ) {
+                    // Shape is inside the hole
+                    setTimeout(() => {
+                        // Delay the alert for 2 seconds
+                        alert("Shape fitted! You win!");
+                    }, 2000);
+
                     return true;
                 }
             }
@@ -133,6 +139,7 @@ const Game = () => {
 
         return false;
     };
+
 
     return (
         <div className={styles.gameContainer}>
