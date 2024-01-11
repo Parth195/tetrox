@@ -37,15 +37,25 @@ const Game = () => {
                 let y = event.gamma;  // Use gamma directly for vertical movement
 
                 // Adjust the sensitivity and scale the values
-                x = x / 5;
-                y = y / 5;
+                x = x / 2;
+                y = y / 2;
 
                 // Update the shape position based on device orientation
-                setShapeStyles(prevStyles => ({
-                    left: `calc(${prevStyles.left} + ${x}%)`,
-                    top: `calc(${prevStyles.top} + ${y}%)`,
-                    backgroundColor: '#fff'
-                }));
+                setShapeStyles(prevStyles => {
+                    // Calculate the new position
+                    const newLeft = parseFloat(prevStyles.left) + x;
+                    const newTop = parseFloat(prevStyles.top) + y;
+
+                    // Bound the shape within the screen limits
+                    const boundedLeft = Math.max(0, Math.min(100, newLeft));
+                    const boundedTop = Math.max(0, Math.min(100, newTop));
+
+                    return {
+                        left: `${boundedLeft}%`,
+                        top: `${boundedTop}%`,
+                        backgroundColor: '#fff'
+                    };
+                });
 
                 // Check if the shape is inside the hole
                 if (isInsideHole()) {
@@ -96,7 +106,7 @@ const Game = () => {
     const createNewShape = () => {
         let newShape = document.createElement("div");
         newShape.className = styles.additionalShape;
-        setElementStyles(newShape, getRandomShapePosition()); // Update the shape's position
+        setElementStyles(newShape, getRandomShapePosition());
         document.getElementById(styles.gameContainer).appendChild(newShape);
     };
 
