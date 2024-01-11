@@ -1,3 +1,5 @@
+/* styles/game.module.css */
+
 .gameContainer {
     position: absolute;
     top: 0;
@@ -10,11 +12,15 @@
     justify-content: center;
 }
 
-.shape {
+.shape,
+.additionalShape,
+.hole {
     width: 50px;
     height: 50px;
-    background-color: #3498db;
     position: absolute;
+}
+
+.shape {
     background-color: #fff;
 }
 
@@ -22,9 +28,14 @@
     width: 60px;
     height: 60px;
     border: 2px solid #e74c3c;
-    position: absolute;
     background-color: #fff;
-    border: 2px solid #e74c3c;
+}
+
+.additionalShape {
+    width: 50px;
+    height: 50px;
+    background-color: #3498db;
+    position: absolute;
 }
 
 .loaderContainer {
