@@ -23,12 +23,15 @@ const Game = () => {
             initializeGame();
 
             const updatePosition = (event) => {
-                let x = event.beta;   // Get the rotation around the x-axis
-                let y = event.gamma;  // Get the rotation around the y-axis
-                let z = event.alpha;  // Get the rotation around the z-axis
+                let x = event.beta * 2;   // Adjust the sensitivity by multiplying
+                let y = event.gamma * 2;  // Adjust the sensitivity by multiplying
+
+                // Limit the translation values to prevent excessive movements
+                x = Math.min(Math.max(x, -30), 30);
+                y = Math.min(Math.max(y, -30), 30);
 
                 // Adjust the game container position based on device orientation
-                setElementStyles(styles.gameContainer, { transform: `translate3d(${x}px, ${y}px, ${z}px)` });
+                setElementStyles(styles.gameContainer, { transform: `translate3d(${x}px, ${y}px, 0)` });
 
                 // Check if the shape is inside the hole
                 if (isInsideHole()) {
@@ -59,6 +62,8 @@ const Game = () => {
         // Reset game elements to their initial positions and appearances
         setElementStyles(styles.gameContainer, { transform: "translate3d(0, 0, 0)" });
         setElementStyles(styles.shape, getRandomShapePosition());
+
+        // Hole is fixed at a specific position
         setElementStyles(styles.hole, { left: '40%', top: '40%', backgroundColor: '#fff' });
 
         // Remove all additional shapes
@@ -123,7 +128,6 @@ const Game = () => {
 
         return false;
     };
-
 
     return (
         <div className={styles.gameContainer}>
