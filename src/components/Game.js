@@ -37,8 +37,8 @@ const Game = () => {
                 let y = event.gamma;  // Use gamma directly for vertical movement
 
                 // Adjust the sensitivity and scale the values
-                x = x / 2;
-                y = y / 2;
+                x = x * 4;
+                y = y * 4;
 
                 // Update the shape position based on device orientation
                 setShapeStyles(prevStyles => {
