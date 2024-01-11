@@ -10,7 +10,7 @@ const Game = ({ onLevelChange }) => {
         left: '40%',
         top: '40%',
         backgroundColor: '#fff',
-        zIndex: 1,
+        zIndex: 1, // Ensure the shape is rendered above other elements
     });
     const [holeStyles, setHoleStyles] = useState({
         left: '40%',
@@ -21,16 +21,12 @@ const Game = ({ onLevelChange }) => {
     let lastAlignmentTime = 0;
 
     useEffect(() => {
-        const sensitivity = 10;
-        const cooldownDuration = 1000;
+        const sensitivity = 10; // Adjust as needed
+        const cooldownDuration = 1000; // 1 second cooldown, adjust as needed
 
         const updatePosition = (event) => {
             let x = event.gamma;
             let y = event.beta;
-
-            // Normalize sensor data to the desired range
-            x = normalize(x, -90, 90);
-            y = normalize(y, -90, 90);
 
             x = x / sensitivity;
             y = y / sensitivity;
@@ -67,8 +63,29 @@ const Game = ({ onLevelChange }) => {
                 };
             });
 
-            logBoundingRectangles();
-            checkAlignment();
+            // Check if the shape is inside the hole with a cooldown
+            const currentTime = Date.now();
+            const shapeInsideHole = isInsideHole();
+            console.log('Is Inside Hole:', shapeInsideHole);
+
+            if (currentTime - lastAlignmentTime > cooldownDuration && shapeInsideHole) {
+                // Update the last alignment time before checking the cooldown
+                lastAlignmentTime = currentTime;
+
+                // Increase the level and notify parent component about level change
+                const newLevel = level + 1;
+                setLevel(newLevel);
+                onLevelChange(newLevel);
+
+                // Handle successful placement (show response when the shape is hidden inside the hole)
+                alert(`Shape fitted! Level ${newLevel} completed!`);
+
+                // Reset the game
+                resetGame();
+
+                // Check for level increase every 10 fits
+                increaseDifficulty();
+            }
         };
 
         window.addEventListener('deviceorientation', updatePosition);
@@ -88,63 +105,8 @@ const Game = ({ onLevelChange }) => {
         };
     }, []);
 
-    const logBoundingRectangles = () => {
-        const holeElement = document.getElementById(styles.hole);
-        const shapes = document.querySelectorAll(`.${styles.additionalShape}`);
-
-        if (holeElement) {
-            const holeRect = holeElement.getBoundingClientRect();
-            console.log('Hole Rectangle:', holeRect);
-        }
-
-        shapes.forEach((shape, index) => {
-            const shapeRect = shape.getBoundingClientRect();
-            console.log(`Shape ${index} Rectangle:`, shapeRect);
-        });
-    };
-
-    const checkAlignment = () => {
-        const shapeInsideHole = isInsideHole();
-        console.log('Is Inside Hole:', shapeInsideHole);
-
-        if (shapeInsideHole) {
-            // Handle successful placement
-            alert(`Shape fitted! Level ${level} completed!`);
-
-            // Reset the game
-            resetGame();
-
-            // Check for level increase every 10 fits
-            increaseDifficulty();
-        }
-    };
-
-    const isInsideHole = () => {
-        const holeElement = document.getElementById(styles.hole);
-
-        if (holeElement) {
-            const hole = holeElement.getBoundingClientRect();
-            const shapes = document.querySelectorAll(`.${styles.additionalShape}`);
-
-            for (const shape of shapes) {
-                const shapeRect = shape.getBoundingClientRect();
-
-                // Check if the shape is inside the hole
-                if (
-                    shapeRect.left > hole.left &&
-                    shapeRect.right < hole.right &&
-                    shapeRect.top > hole.top &&
-                    shapeRect.bottom < hole.bottom
-                ) {
-                    console.log('Is Inside Hole: true');
-                    return true;
-                } else {
-                    console.log('Is Inside Hole: false');
-                }
-            }
-        }
-
-        return false;
+    const initializeGame = () => {
+        resetGame();
     };
 
     const resetGame = () => {
@@ -152,17 +114,20 @@ const Game = ({ onLevelChange }) => {
             left: '40%',
             top: '40%',
             backgroundColor: '#fff',
-            zIndex: 1,
+            zIndex: 1, // Ensure the shape is rendered above other elements
         });
         setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
 
+        // Remove all additional shapes
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
         additionalShapes.forEach((shape) => shape.remove());
 
+        // Create a new shape
         createNewShape();
     };
 
     const increaseDifficulty = () => {
+        // Create a new shape for each level increase
         createNewShape();
     };
 
@@ -171,6 +136,31 @@ const Game = ({ onLevelChange }) => {
         newShape.className = styles.additionalShape;
         setElementStyles(newShape, getRandomShapePosition());
         document.getElementById(styles.gameContainer).appendChild(newShape);
+    };
+
+    const isInsideHole = () => {
+        let holeElement = document.getElementById(styles.hole);
+
+        if (holeElement) {
+            let hole = holeElement.getBoundingClientRect();
+            let shapes = document.querySelectorAll(`.${styles.additionalShape}`);
+
+            for (let shape of shapes) {
+                let shapeRect = shape.getBoundingClientRect();
+
+                // Check if the entire shape is inside the hole
+                if (
+                    shapeRect.left >= hole.left &&
+                    shapeRect.right <= hole.right &&
+                    shapeRect.top >= hole.top &&
+                    shapeRect.bottom <= hole.bottom
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     };
 
     const setElementStyles = (element, styles) => {
@@ -183,10 +173,6 @@ const Game = ({ onLevelChange }) => {
         let randomX = Math.floor(Math.random() * (window.innerWidth - 50));
         let randomY = Math.floor(Math.random() * (window.innerHeight - 50));
         return { left: `${randomX}px`, top: `${randomY}px`, backgroundColor: '#fff' };
-    };
-
-    const normalize = (value, min, max) => {
-        return Math.min(max, Math.max(min, value));
     };
 
     return (
