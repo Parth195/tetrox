@@ -6,6 +6,11 @@ import styles from '../styles/game.module.css';
 
 const Game = () => {
     const [loading, setLoading] = useState(true);
+    const [shapeStyles, setShapeStyles] = useState({
+        left: '40%',
+        top: '40%',
+        backgroundColor: '#fff'
+    });
     const [holeStyles, setHoleStyles] = useState({
         left: '40%',
         top: '40%',
@@ -28,15 +33,19 @@ const Game = () => {
             initializeGame();
 
             const updatePosition = (event) => {
-                let x = event.beta * 2;   // Adjust the sensitivity by multiplying
-                let y = event.gamma * 2;  // Adjust the sensitivity by multiplying
+                let x = event.beta;   // Use beta directly for horizontal movement
+                let y = event.gamma;  // Use gamma directly for vertical movement
 
-                // Limit the translation values to prevent excessive movements
-                x = Math.min(Math.max(x, -30), 30);
-                y = Math.min(Math.max(y, -30), 30);
+                // Adjust the sensitivity and scale the values
+                x = x / 5;
+                y = y / 5;
 
-                // Adjust the game container position based on device orientation
-                setElementStyles(styles.gameContainer, { transform: `translate3d(${x}px, ${y}px, 0)` });
+                // Update the shape position based on device orientation
+                setShapeStyles(prevStyles => ({
+                    left: `calc(${prevStyles.left} + ${x}%)`,
+                    top: `calc(${prevStyles.top} + ${y}%)`,
+                    backgroundColor: '#fff'
+                }));
 
                 // Check if the shape is inside the hole
                 if (isInsideHole()) {
@@ -65,32 +74,13 @@ const Game = () => {
 
     const resetGame = () => {
         // Reset game elements to their initial positions and appearances
-        setElementStyles(styles.gameContainer, { transform: "translate3d(0, 0, 0)" });
-        setElementStyles(styles.shape, getRandomShapePosition());
+        setShapeStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
         // Set the hole's initial position without modifying left and top
         setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
 
         // Remove all additional shapes
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
         additionalShapes.forEach(shape => shape.remove());
-    };
-
-
-    const setElementStyles = (elementClassName, styles) => {
-        const elements = document.getElementsByClassName(elementClassName);
-        if (elements.length > 0) {
-            Array.from(elements).forEach(element => {
-                Object.entries(styles).forEach(([property, value]) => {
-                    element.style[property] = value;
-                });
-            });
-        }
-    };
-
-    const getRandomShapePosition = () => {
-        let randomX = Math.floor(Math.random() * (window.innerWidth - 50));
-        let randomY = Math.floor(Math.random() * (window.innerHeight - 50));
-        return { left: `${randomX}px`, top: `${randomY}px`, backgroundColor: '#fff' };
     };
 
     const increaseDifficulty = () => {
@@ -106,7 +96,7 @@ const Game = () => {
     const createNewShape = () => {
         let newShape = document.createElement("div");
         newShape.className = styles.additionalShape;
-        setElementStyles(styles.gameContainer, getRandomShapePosition());
+        setElementStyles(newShape, getRandomShapePosition()); // Update the shape's position
         document.getElementById(styles.gameContainer).appendChild(newShape);
     };
 
@@ -115,9 +105,9 @@ const Game = () => {
 
         if (holeElement) {
             let hole = holeElement.getBoundingClientRect();
-            let shapes = document.querySelectorAll(`.${styles.additionalShape}`);
+            let shape = document.querySelector(`.${styles.additionalShape}`);
 
-            for (let shape of shapes) {
+            if (shape) {
                 let shapeRect = shape.getBoundingClientRect();
 
                 if (
@@ -142,7 +132,7 @@ const Game = () => {
                 </div>
             ) : (
                 <>
-                    <div className={styles.shape}></div>
+                    <div className={styles.shape} style={shapeStyles}></div>
                     <div className={styles.hole} style={holeStyles}></div>
                 </>
             )}
