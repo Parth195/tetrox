@@ -6,6 +6,11 @@ import styles from '../styles/game.module.css';
 
 const Game = () => {
     const [loading, setLoading] = useState(true);
+    const [holeStyles, setHoleStyles] = useState({
+        left: '40%',
+        top: '40%',
+        backgroundColor: '#fff'
+    });
 
     useEffect(() => {
         // Simulate a 3-second loading time
@@ -62,13 +67,8 @@ const Game = () => {
         // Reset game elements to their initial positions and appearances
         setElementStyles(styles.gameContainer, { transform: "translate3d(0, 0, 0)" });
         setElementStyles(styles.shape, getRandomShapePosition());
-
-        // Hole is fixed at a specific position - no need to update hole position
-        setElementStyles(styles.hole, { backgroundColor: '#fff' });
-
-        // Remove all additional shapes
-        let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
-        additionalShapes.forEach(shape => shape.remove());
+        // Hole position remains fixed
+        // setElementStyles(styles.hole, { left: '40%', top: '40%', backgroundColor: '#fff' });
     };
 
     const setElementStyles = (elementClassName, styles) => {
@@ -138,7 +138,7 @@ const Game = () => {
             ) : (
                 <>
                     <div className={styles.shape}></div>
-                    <div className={styles.hole}></div>
+                    <div className={styles.hole} style={holeStyles}></div>
                 </>
             )}
         </div>
