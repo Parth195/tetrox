@@ -33,12 +33,12 @@ const Game = () => {
             initializeGame();
 
             const updatePosition = (event) => {
-                let x = event.beta;   // Use beta directly for horizontal movement
-                let y = event.gamma;  // Use gamma directly for vertical movement
+                let x = event.gamma; // Use gamma for horizontal movement
+                let y = event.beta;  // Use beta for vertical movement
 
                 // Adjust the sensitivity and scale the values
-                x = x * 4;
-                y = y * 4;
+                x = x / 10;
+                y = y / 10;
 
                 // Update the shape position based on device orientation
                 setShapeStyles(prevStyles => {
