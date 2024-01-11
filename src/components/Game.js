@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { BeatLoader } from 'react-spinners';
 import styles from '../styles/game.module.css';
 
-const Game = () => {
+const Game = ({ onLevelChange }) => {
     const [loading, setLoading] = useState(true);
     const [shapeStyles, setShapeStyles] = useState({
         left: '40%',
@@ -39,7 +39,7 @@ const Game = () => {
                 x = x / 10;
                 y = y / 10;
 
-                setShapeStyles(prevStyles => {
+                setShapeStyles((prevStyles) => {
                     const newLeft = parseFloat(prevStyles.left) + x;
                     const newTop = parseFloat(prevStyles.top) + y;
 
@@ -71,6 +71,9 @@ const Game = () => {
             // Increase the level
             setLevel(level + 1);
 
+            // Notify parent component about level change
+            onLevelChange(level + 1);
+
             // Reset the game
             resetGame();
 
@@ -88,7 +91,7 @@ const Game = () => {
         setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
 
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
-        additionalShapes.forEach(shape => shape.remove());
+        additionalShapes.forEach((shape) => shape.remove());
     };
 
     const increaseDifficulty = () => {
@@ -101,7 +104,7 @@ const Game = () => {
     };
 
     const createNewShape = () => {
-        let newShape = document.createElement("div");
+        let newShape = document.createElement('div');
         newShape.className = styles.additionalShape;
         setElementStyles(newShape, getRandomShapePosition());
         document.getElementById(styles.gameContainer).appendChild(newShape);
@@ -117,6 +120,7 @@ const Game = () => {
             if (shape) {
                 let shapeRect = shape.getBoundingClientRect();
 
+                // Check if all corners of the shape are inside the hole
                 return (
                     shapeRect.left >= hole.left &&
                     shapeRect.right <= hole.right &&
