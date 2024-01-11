@@ -8,11 +8,11 @@ const Home = () => {
   return (
     <div>
       <Head>
-        <title>Your Game Title</title>
+        <title>TETROX</title>
       </Head>
 
       <main>
-        <h1>Your Game Title</h1>
+        <h1>TETROX</h1>
         <Game />
       </main>
     </div>

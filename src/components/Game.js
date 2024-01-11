@@ -58,22 +58,12 @@ const Game = () => {
     const resetGame = () => {
         // Reset game elements to their initial positions and appearances
         setElementStyles(styles.gameContainer, { transform: "translate3d(0, 0, 0)" });
-        setElementStyles(styles.shape, { left: '50%', top: '50%', backgroundColor: '#fff' });
+        setElementStyles(styles.shape, getRandomShapePosition());
         setElementStyles(styles.hole, { left: '40%', top: '40%', backgroundColor: '#fff' });
 
         // Remove all additional shapes
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
         additionalShapes.forEach(shape => shape.remove());
-
-        // Generate a new random position for the hole
-        let randomHoleX = Math.floor(Math.random() * (window.innerWidth - 60));
-        let randomHoleY = Math.floor(Math.random() * (window.innerHeight - 60));
-        setElementStyles(styles.hole, { left: `${randomHoleX}px`, top: `${randomHoleY}px` });
-
-        // Generate a new random position for the main shape
-        let randomShapeX = Math.floor(Math.random() * (window.innerWidth - 50));
-        let randomShapeY = Math.floor(Math.random() * (window.innerHeight - 50));
-        setElementStyles(styles.shape, { left: `${randomShapeX}px`, top: `${randomShapeY}px` });
     };
 
     const setElementStyles = (elementClassName, styles) => {
@@ -87,6 +77,12 @@ const Game = () => {
         }
     };
 
+    const getRandomShapePosition = () => {
+        let randomX = Math.floor(Math.random() * (window.innerWidth - 50));
+        let randomY = Math.floor(Math.random() * (window.innerHeight - 50));
+        return { left: `${randomX}px`, top: `${randomY}px`, backgroundColor: '#fff' };
+    };
+
     const increaseDifficulty = () => {
         // Increase the number of shapes
         let fitCount = document.querySelectorAll(`.${styles.additionalShape}`).length;
@@ -95,16 +91,12 @@ const Game = () => {
         for (let i = 0; i < numberOfShapes; i++) {
             createNewShape();
         }
-
-        // Adjust the hole position
-        let randomHoleX = Math.floor(Math.random() * (window.innerWidth - 60));
-        let randomHoleY = Math.floor(Math.random() * (window.innerHeight - 60));
-        setElementStyles(styles.hole, { left: `${randomHoleX}px`, top: `${randomHoleY}px` });
     };
 
     const createNewShape = () => {
         let newShape = document.createElement("div");
         newShape.className = styles.additionalShape;
+        setElementStyles(styles.gameContainer, getRandomShapePosition());
         document.getElementById(styles.gameContainer).appendChild(newShape);
     };
 
@@ -112,8 +104,8 @@ const Game = () => {
         let holeElement = document.getElementById(styles.hole);
 
         if (holeElement) {
-            let shapes = document.querySelectorAll(`.${styles.additionalShape}`);
             let hole = holeElement.getBoundingClientRect();
+            let shapes = document.querySelectorAll(`.${styles.additionalShape}`);
 
             for (let shape of shapes) {
                 let shapeRect = shape.getBoundingClientRect();
