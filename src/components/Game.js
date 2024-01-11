@@ -51,18 +51,6 @@ const Game = () => {
                         backgroundColor: '#fff'
                     };
                 });
-
-                // Check if the shape is inside the hole
-                if (isInsideHole()) {
-                    // Reset the game (move this part outside if you want to keep the shape inside the hole)
-                    resetGame();
-
-                    // Handle successful placement (show response when the shape is hidden inside the hole)
-                    alert("Shape fitted! You win!");
-
-                    // Check for level increase every 10 fits
-                    increaseDifficulty();
-                }
             };
 
             window.addEventListener('deviceorientation', updatePosition);
@@ -72,6 +60,20 @@ const Game = () => {
             };
         }
     }, [loading]);
+
+    useEffect(() => {
+        // Check if the shape is inside the hole separately from motion update
+        if (isInsideHole()) {
+            // Handle successful placement (show response when the shape is hidden inside the hole)
+            alert("Shape fitted! You win!");
+
+            // Reset the game
+            resetGame();
+
+            // Check for level increase every 10 fits
+            increaseDifficulty();
+        }
+    }, [shapeStyles]);
 
     const initializeGame = () => {
         resetGame();
