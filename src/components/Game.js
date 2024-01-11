@@ -130,7 +130,7 @@ const Game = () => {
                     setTimeout(() => {
                         // Delay the alert for 2 seconds
                         alert("Shape fitted! You win!");
-                    }, 2000);
+                    }, 1000);
 
                     return true;
                 }
