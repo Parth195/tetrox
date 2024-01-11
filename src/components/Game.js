@@ -16,6 +16,7 @@ const Game = () => {
         top: '40%',
         backgroundColor: '#fff'
     });
+    const [level, setLevel] = useState(1);
 
     useEffect(() => {
         const loadingTimeout = setTimeout(() => {
@@ -65,7 +66,10 @@ const Game = () => {
         // Check if the shape is inside the hole separately from motion update
         if (isInsideHole()) {
             // Handle successful placement (show response when the shape is hidden inside the hole)
-            alert("Shape fitted! You win!");
+            alert(`Level ${level} completed!`);
+
+            // Increase the level
+            setLevel(level + 1);
 
             // Reset the game
             resetGame();
