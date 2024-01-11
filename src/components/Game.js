@@ -67,9 +67,14 @@ const Game = () => {
         // Reset game elements to their initial positions and appearances
         setElementStyles(styles.gameContainer, { transform: "translate3d(0, 0, 0)" });
         setElementStyles(styles.shape, getRandomShapePosition());
-        // Hole position remains fixed
-        // setElementStyles(styles.hole, { left: '40%', top: '40%', backgroundColor: '#fff' });
+        // Set the hole's initial position without modifying left and top
+        setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
+
+        // Remove all additional shapes
+        let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
+        additionalShapes.forEach(shape => shape.remove());
     };
+
 
     const setElementStyles = (elementClassName, styles) => {
         const elements = document.getElementsByClassName(elementClassName);
