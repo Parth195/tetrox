@@ -11,7 +11,7 @@ const Game = () => {
         // Simulate a 3-second loading time
         const loadingTimeout = setTimeout(() => {
             setLoading(false);
-        }, 3000);
+        }, 1500);
 
         return () => {
             clearTimeout(loadingTimeout);
@@ -63,8 +63,8 @@ const Game = () => {
         setElementStyles(styles.gameContainer, { transform: "translate3d(0, 0, 0)" });
         setElementStyles(styles.shape, getRandomShapePosition());
 
-        // Hole is fixed at a specific position
-        setElementStyles(styles.hole, { left: '40%', top: '40%', backgroundColor: '#fff' });
+        // Hole is fixed at a specific position - no need to update hole position
+        setElementStyles(styles.hole, { backgroundColor: '#fff' });
 
         // Remove all additional shapes
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
