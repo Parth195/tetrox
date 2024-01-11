@@ -18,7 +18,6 @@ const Game = () => {
     });
 
     useEffect(() => {
-        // Simulate a 3-second loading time
         const loadingTimeout = setTimeout(() => {
             setLoading(false);
         }, 1500);
@@ -33,20 +32,16 @@ const Game = () => {
             initializeGame();
 
             const updatePosition = (event) => {
-                let x = event.gamma; // Use gamma for horizontal movement
-                let y = event.beta;  // Use beta for vertical movement
+                let x = event.gamma;
+                let y = event.beta;
 
-                // Adjust the sensitivity and scale the values
                 x = x / 10;
                 y = y / 10;
 
-                // Update the shape position based on device orientation
                 setShapeStyles(prevStyles => {
-                    // Calculate the new position
                     const newLeft = parseFloat(prevStyles.left) + x;
                     const newTop = parseFloat(prevStyles.top) + y;
 
-                    // Bound the shape within the screen limits
                     const boundedLeft = Math.max(0, Math.min(100, newLeft));
                     const boundedTop = Math.max(0, Math.min(100, newTop));
 
@@ -59,14 +54,14 @@ const Game = () => {
 
                 // Check if the shape is inside the hole
                 if (isInsideHole()) {
-                    // Handle successful placement
+                    // Reset the game (move this part outside if you want to keep the shape inside the hole)
+                    resetGame();
+
+                    // Handle successful placement (show response when the shape is hidden inside the hole)
                     alert("Shape fitted! You win!");
 
                     // Check for level increase every 10 fits
                     increaseDifficulty();
-
-                    // Reset the game
-                    resetGame();
                 }
             };
 
@@ -83,20 +78,16 @@ const Game = () => {
     };
 
     const resetGame = () => {
-        // Reset game elements to their initial positions and appearances
         setShapeStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
-        // Set the hole's initial position without modifying left and top
         setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
 
-        // Remove all additional shapes
         let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
         additionalShapes.forEach(shape => shape.remove());
     };
 
     const increaseDifficulty = () => {
-        // Increase the number of shapes
         let fitCount = document.querySelectorAll(`.${styles.additionalShape}`).length;
-        let numberOfShapes = fitCount % 10 === 0 ? 2 : 1; // Increase shapes every 10 fits
+        let numberOfShapes = fitCount % 10 === 0 ? 2 : 1;
 
         for (let i = 0; i < numberOfShapes; i++) {
             createNewShape();
@@ -120,26 +111,17 @@ const Game = () => {
             if (shape) {
                 let shapeRect = shape.getBoundingClientRect();
 
-                if (
+                return (
                     shapeRect.left >= hole.left &&
                     shapeRect.right <= hole.right &&
                     shapeRect.top >= hole.top &&
                     shapeRect.bottom <= hole.bottom
-                ) {
-                    // Shape is inside the hole
-                    setTimeout(() => {
-                        // Delay the alert for 2 seconds
-                        alert("Shape fitted! You win!");
-                    }, 1000);
-
-                    return true;
-                }
+                );
             }
         }
 
         return false;
     };
-
 
     return (
         <div className={styles.gameContainer}>
