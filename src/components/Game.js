@@ -18,11 +18,13 @@ const Game = ({ onLevelChange }) => {
         backgroundColor: '#fff',
     });
     const [level, setLevel] = useState(1);
-    let lastAlignmentTime = 0;
 
     useEffect(() => {
+        // Constants for sensitivity and cooldown
         const sensitivity = 10; // Adjust as needed
         const cooldownDuration = 1000; // 1 second cooldown, adjust as needed
+
+        let lastAlignmentTime = 0;
 
         const updatePosition = (event) => {
             let x = event.gamma;
@@ -38,24 +40,6 @@ const Game = ({ onLevelChange }) => {
                 const boundedLeft = Math.max(0, Math.min(100, newLeft));
                 const boundedTop = Math.max(0, Math.min(100, newTop));
 
-                console.log('Current Shape Position:', boundedLeft, boundedTop);
-
-                return {
-                    ...prevStyles,
-                    left: `${boundedLeft}%`,
-                    top: `${boundedTop}%`,
-                };
-            });
-
-            setHoleStyles((prevStyles) => {
-                const newLeft = parseFloat(prevStyles.left) + x;
-                const newTop = parseFloat(prevStyles.top) + y;
-
-                const boundedLeft = Math.max(0, Math.min(100, newLeft));
-                const boundedTop = Math.max(0, Math.min(100, newTop));
-
-                console.log('Current Hole Position:', boundedLeft, boundedTop);
-
                 return {
                     ...prevStyles,
                     left: `${boundedLeft}%`,
@@ -65,13 +49,7 @@ const Game = ({ onLevelChange }) => {
 
             // Check if the shape is inside the hole with a cooldown
             const currentTime = Date.now();
-            const shapeInsideHole = isInsideHole();
-            console.log('Is Inside Hole:', shapeInsideHole);
-
-            if (currentTime - lastAlignmentTime > cooldownDuration && shapeInsideHole) {
-                // Update the last alignment time before checking the cooldown
-                lastAlignmentTime = currentTime;
-
+            if (currentTime - lastAlignmentTime > cooldownDuration && isInsideHole()) {
                 // Increase the level and notify parent component about level change
                 const newLevel = level + 1;
                 setLevel(newLevel);
@@ -85,6 +63,9 @@ const Game = ({ onLevelChange }) => {
 
                 // Check for level increase every 10 fits
                 increaseDifficulty();
+
+                // Update the last alignment time
+                lastAlignmentTime = currentTime;
             }
         };
 
