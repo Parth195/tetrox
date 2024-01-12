@@ -17,7 +17,8 @@ const Game = ({ onLevelChange }) => {
         top: '40%',
         backgroundColor: '#fff',
     });
-    const [level, setLevel] = useState(1);
+    const [level,setLevel] = useState(1);
+    const [score,setScore] = useState(0);
 
     useEffect(() => {
         // Constants for sensitivity and cooldown
@@ -50,22 +51,34 @@ const Game = ({ onLevelChange }) => {
             // Check if the shape is inside the hole with a cooldown
             const currentTime = Date.now();
             if (currentTime - lastAlignmentTime > cooldownDuration && isInsideHole()) {
-                // Increase the level and notify parent component about level change
-                const newLevel = level + 1;
-                setLevel(newLevel);
-                onLevelChange(newLevel);
+                // Calculate the percentage of overlap between the shape and the hole
+                const overlapPercentage = calculateOverlapPercentage();
 
-                // Handle successful placement (show response when the shape is hidden inside the hole)
-                alert(`Shape fitted! Level ${newLevel} completed!`);
+                // If the overlap is greater than 90%, trigger success
+                if (overlapPercentage > 90) {
+                    // Increase the score and notify parent component about the score change
+                    const newScore = score + 1;
+                    setScore(newScore);
+                    onScoreChange(newScore);
 
-                // Reset the game
-                resetGame();
+                    // Change the background color to green for 500ms
+                    document.body.style.backgroundColor = '#00FF00';
+                    setTimeout(() => {
+                        document.body.style.backgroundColor = ''; // Reset the background color
+                    },500);
 
-                // Check for level increase every 10 fits
-                increaseDifficulty();
+                    // Handle successful placement (show response when the shape is hidden inside the hole)
+                    alert(`Shape fitted! Score increased!`);
 
-                // Update the last alignment time
-                lastAlignmentTime = currentTime;
+                    // Reset the game
+                    resetGame();
+
+                    // Check for level increase every 10 fits
+                    increaseDifficulty();
+
+                    // Update the last alignment time
+                    lastAlignmentTime = currentTime;
+                }
             }
         };
 
@@ -74,7 +87,7 @@ const Game = ({ onLevelChange }) => {
         return () => {
             window.removeEventListener('deviceorientation', updatePosition);
         };
-    }, [loading, level]);
+    },[loading,level,score]);
 
     useEffect(() => {
         const loadingTimeout = setTimeout(() => {
@@ -154,6 +167,29 @@ const Game = ({ onLevelChange }) => {
         let randomX = Math.floor(Math.random() * (window.innerWidth - 50));
         let randomY = Math.floor(Math.random() * (window.innerHeight - 50));
         return { left: `${randomX}px`, top: `${randomY}px`, backgroundColor: '#fff' };
+    };
+
+    const calculateOverlapPercentage = () => {
+        // Calculate the overlap percentage between the shape and the hole
+        const holeElement = document.getElementById(styles.hole);
+        const shapeElement = document.querySelector(`.${styles.shape}`);
+
+        if (holeElement && shapeElement) {
+            const holeRect = holeElement.getBoundingClientRect();
+            const shapeRect = shapeElement.getBoundingClientRect();
+
+            const overlapWidth = Math.max(0,Math.min(shapeRect.right,holeRect.right) - Math.max(shapeRect.left,holeRect.left));
+            const overlapHeight = Math.max(0,Math.min(shapeRect.bottom,holeRect.bottom) - Math.max(shapeRect.top,holeRect.top));
+
+            const overlapArea = overlapWidth * overlapHeight;
+            const shapeArea = (shapeRect.right - shapeRect.left) * (shapeRect.bottom - shapeRect.top);
+
+            const overlapPercentage = (overlapArea / shapeArea) * 100;
+
+            return overlapPercentage;
+        }
+
+        return 0;
     };
 
     return (
