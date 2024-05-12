@@ -1,29 +1,25 @@
-// components/Game.js
-
-import React, { useState, useEffect } from 'react';
+import React,{ useState,useEffect } from 'react';
 import { BeatLoader } from 'react-spinners';
 import styles from '../styles/game.module.css';
 
-const Game = ({ onLevelChange }) => {
-    const [loading, setLoading] = useState(true);
-    const [shapeStyles, setShapeStyles] = useState({
+const Game = ({ onScoreChange }) => {
+    const [loading,setLoading] = useState(true);
+    const [shapeStyles,setShapeStyles] = useState({
         left: '40%',
         top: '40%',
         backgroundColor: '#fff',
-        zIndex: 1, // Ensure the shape is rendered above other elements
+        zIndex: 1,
     });
-    const [holeStyles, setHoleStyles] = useState({
+    const [holeStyles,setHoleStyles] = useState({
         left: '40%',
         top: '40%',
         backgroundColor: '#fff',
     });
-    const [level,setLevel] = useState(1);
     const [score,setScore] = useState(0);
 
     useEffect(() => {
-        // Constants for sensitivity and cooldown
-        const sensitivity = 10; // Adjust as needed
-        const cooldownDuration = 1000; // 1 second cooldown, adjust as needed
+        const sensitivity = 10;
+        const cooldownDuration = 1000;
 
         let lastAlignmentTime = 0;
 
@@ -34,101 +30,70 @@ const Game = ({ onLevelChange }) => {
             x = x / sensitivity;
             y = y / sensitivity;
 
-            setShapeStyles((prevStyles) => {
-                const newLeft = parseFloat(prevStyles.left) + x;
-                const newTop = parseFloat(prevStyles.top) + y;
+            const newLeft = parseFloat(shapeStyles.left) + x;
+            const newTop = parseFloat(shapeStyles.top) + y;
 
-                const boundedLeft = Math.max(0, Math.min(100, newLeft));
-                const boundedTop = Math.max(0, Math.min(100, newTop));
+            const boundedLeft = Math.max(0,Math.min(100,newLeft));
+            const boundedTop = Math.max(0,Math.min(100,newTop));
 
-                return {
-                    ...prevStyles,
-                    left: `${boundedLeft}%`,
-                    top: `${boundedTop}%`,
-                };
+            setShapeStyles({
+                ...shapeStyles,
+                left: `${boundedLeft}%`,
+                top: `${boundedTop}%`,
             });
 
-            // Check if the shape is inside the hole with a cooldown
             const currentTime = Date.now();
             if (currentTime - lastAlignmentTime > cooldownDuration && isInsideHole()) {
-                // Calculate the percentage of overlap between the shape and the hole
                 const overlapPercentage = calculateOverlapPercentage();
-
-                // If the overlap is greater than 90%, trigger success
                 if (overlapPercentage > 90) {
-                    // Increase the score and notify parent component about the score change
                     const newScore = score + 1;
                     setScore(newScore);
                     onScoreChange(newScore);
 
-                    // Change the background color to green for 500ms
                     document.body.style.backgroundColor = '#00FF00';
                     setTimeout(() => {
-                        document.body.style.backgroundColor = ''; // Reset the background color
+                        document.body.style.backgroundColor = '';
                     },500);
 
-                    // Handle successful placement (show response when the shape is hidden inside the hole)
                     alert(`Shape fitted! Score increased!`);
-
-                    // Reset the game
-                    resetGame();
-
-                    // Check for level increase every 10 fits
-                    increaseDifficulty();
-
-                    // Update the last alignment time
                     lastAlignmentTime = currentTime;
+                    resetGame();
                 }
             }
         };
 
-        window.addEventListener('deviceorientation', updatePosition);
+        window.addEventListener('deviceorientation',updatePosition);
 
         return () => {
-            window.removeEventListener('deviceorientation', updatePosition);
+            window.removeEventListener('deviceorientation',updatePosition);
         };
-    },[loading,level,score]);
+    },[shapeStyles,score,onScoreChange]);
 
     useEffect(() => {
         const loadingTimeout = setTimeout(() => {
             setLoading(false);
-        }, 1500);
+        },1500);
 
         return () => {
             clearTimeout(loadingTimeout);
         };
-    }, []);
-
-    const initializeGame = () => {
-        resetGame();
-    };
+    },[]);
 
     const resetGame = () => {
         setShapeStyles({
             left: '40%',
             top: '40%',
             backgroundColor: '#fff',
-            zIndex: 1, // Ensure the shape is rendered above other elements
+            zIndex: 1,
         });
-        setHoleStyles({ left: '40%', top: '40%', backgroundColor: '#fff' });
-
-        // Remove all additional shapes
-        let additionalShapes = document.querySelectorAll(`.${styles.additionalShape}`);
-        additionalShapes.forEach((shape) => shape.remove());
-
-        // Create a new shape
-        createNewShape();
-    };
-
-    const increaseDifficulty = () => {
-        // Create a new shape for each level increase
+        setHoleStyles({ left: '40%',top: '40%',backgroundColor: '#fff' });
         createNewShape();
     };
 
     const createNewShape = () => {
         let newShape = document.createElement('div');
         newShape.className = styles.additionalShape;
-        setElementStyles(newShape, getRandomShapePosition());
+        setElementStyles(newShape,getRandomShapePosition());
         document.getElementById(styles.gameContainer).appendChild(newShape);
     };
 
@@ -141,8 +106,6 @@ const Game = ({ onLevelChange }) => {
 
             for (let shape of shapes) {
                 let shapeRect = shape.getBoundingClientRect();
-
-                // Check if the entire shape is inside the hole
                 if (
                     shapeRect.left >= hole.left &&
                     shapeRect.right <= hole.right &&
@@ -157,8 +120,8 @@ const Game = ({ onLevelChange }) => {
         return false;
     };
 
-    const setElementStyles = (element, styles) => {
-        Object.entries(styles).forEach(([property, value]) => {
+    const setElementStyles = (element,styles) => {
+        Object.entries(styles).forEach(([property,value]) => {
             element.style[property] = value;
         });
     };
@@ -166,11 +129,10 @@ const Game = ({ onLevelChange }) => {
     const getRandomShapePosition = () => {
         let randomX = Math.floor(Math.random() * (window.innerWidth - 50));
         let randomY = Math.floor(Math.random() * (window.innerHeight - 50));
-        return { left: `${randomX}px`, top: `${randomY}px`, backgroundColor: '#fff' };
+        return { left: `${randomX}px`,top: `${randomY}px`,backgroundColor: '#fff' };
     };
 
     const calculateOverlapPercentage = () => {
-        // Calculate the overlap percentage between the shape and the hole
         const holeElement = document.getElementById(styles.hole);
         const shapeElement = document.querySelector(`.${styles.shape}`);
 
@@ -193,7 +155,7 @@ const Game = ({ onLevelChange }) => {
     };
 
     return (
-        <div className={styles.gameContainer}>
+        <div className={styles.gameContainer} id={styles.gameContainer}>
             {loading ? (
                 <div className={styles.loaderContainer}>
                     <BeatLoader color="#3498db" size={20} margin={5} />
@@ -201,7 +163,7 @@ const Game = ({ onLevelChange }) => {
             ) : (
                 <>
                     <div className={styles.shape} style={shapeStyles}></div>
-                    <div className={styles.hole} style={holeStyles}></div>
+                    <div className={styles.hole} id={styles.hole} style={holeStyles}></div>
                 </>
             )}
         </div>
