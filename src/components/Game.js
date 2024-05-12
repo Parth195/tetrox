@@ -50,14 +50,15 @@ const Game = ({ onScoreChange }) => {
                     setScore(newScore);
                     onScoreChange(newScore);
 
+                    // Change background color to green
                     document.body.style.backgroundColor = '#00FF00';
                     setTimeout(() => {
                         document.body.style.backgroundColor = '';
                     },500);
 
-                    alert(`Shape fitted! Score increased!`);
-                    lastAlignmentTime = currentTime;
+                    // Reset game
                     resetGame();
+                    lastAlignmentTime = currentTime;
                 }
             }
         };
