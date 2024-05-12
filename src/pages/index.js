@@ -1,14 +1,19 @@
 // pages/index.js
 
-import React, { useState } from 'react';
+import React,{ useState } from 'react';
 import Head from 'next/head';
 import Game from '../components/Game';
 
 const Home = () => {
-  const [currentLevel, setCurrentLevel] = useState(1);
+  const [currentLevel,setCurrentLevel] = useState(1);
+  const [score,setScore] = useState(0);
 
   const handleLevelChange = (newLevel) => {
     setCurrentLevel(newLevel);
+  };
+
+  const handleScoreChange = (newScore) => {
+    setScore(newScore);
   };
 
   return (
@@ -20,7 +25,8 @@ const Home = () => {
       <main>
         <h1>TETROX</h1>
         <p>Level: {currentLevel}</p>
-        <Game onLevelChange={handleLevelChange} />
+        <p>Score: {score}</p>
+        <Game onLevelChange={handleLevelChange} onScoreChange={handleScoreChange} />
       </main>
     </div>
   );
